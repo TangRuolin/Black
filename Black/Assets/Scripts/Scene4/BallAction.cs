@@ -21,7 +21,11 @@ public class BallAction : MonoBehaviour ,IDragHandler{
     private Vector3[] dire;
     private float speed;
     public int num;
-    
+    private Vector3 oldPos;
+    private float hideTime;
+    private float showTime;
+    private bool move = true;
+
     private void OnCollisionEnter2D(Collision2D collision)
     {
         if (collision.gameObject.tag == "Ball")
@@ -39,6 +43,10 @@ public class BallAction : MonoBehaviour ,IDragHandler{
         radius = Scene4.Instance.radius;
         curRecTran = GetComponent<RectTransform>();
         speed = Scene4.Instance.speed;
+        oldPos = transform.position;
+        hideTime = Scene4.Instance.ballHideTime;
+        showTime = Scene4.Instance.ballShowTime;
+        StartCoroutine(BallMove());
     }
 	
 	// Update is called once per frame
@@ -51,6 +59,7 @@ public class BallAction : MonoBehaviour ,IDragHandler{
                 nowDirection = dire[num];
                 GetComponent<Image>().sprite = BallAfter;
                 change = false;
+                move = false;
             }
             transform.Translate(nowDirection*speed);
         }
@@ -60,7 +69,9 @@ public class BallAction : MonoBehaviour ,IDragHandler{
             {
                 GetComponent<Image>().sprite = BallBefore;
                 change = true;
+                move = true;
             }
+            
         }
 	}
     /// <summary>
@@ -109,8 +120,26 @@ public class BallAction : MonoBehaviour ,IDragHandler{
        // nowDirection = newDire;
     }
 
-    
-   
+    /// <summary>
+    /// 小球微震动
+    /// </summary>
+    IEnumerator BallMove()
+    {
+        float moveTime = 0.01f;
+        while (true)
+        {
+            if (move)
+            {
+                transform.DOMoveY(transform.position.y + 8, moveTime, true);
+                yield return new WaitForSeconds(moveTime);
+                transform.DOMoveY(transform.position.y - 8, moveTime, true);
+                yield return new WaitForSeconds(moveTime);
+            }
+            yield return null;
+        }
+      
+    }
+
 
     /// <summary>
     /// 小球的拖动
@@ -128,4 +157,20 @@ public class BallAction : MonoBehaviour ,IDragHandler{
         }
        
     }
+
+    public void ResetPos()
+    {
+        transform.position = oldPos;
+    }
+
+    public void Hide()
+    {
+        GetComponent<Image>().DOFade(0,hideTime);
+    }
+
+    public void Show()
+    {
+        GetComponent<Image>().DOFade(1,showTime);
+    }
+
 }

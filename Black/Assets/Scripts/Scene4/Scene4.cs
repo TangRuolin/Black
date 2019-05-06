@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using DG.Tweening;
 
 public class Scene4 : MonoBehaviour {
 
@@ -11,8 +12,13 @@ public class Scene4 : MonoBehaviour {
     public Vector3[] Position;
     private System.Random random = new System.Random();
     public float speed = 2;
-    public float maskSpeed = 1;
-    public bool canMove = true;
+    public float ballHideTime = 2;
+    public float ballShowTime = 2;
+    public float maskTime = 3;
+    public float ballMoveTime = 3;
+    public Vector3 maskScale = new Vector3(0.63f,0.63f,0.63f);
+    public float maskScaleTime = 5;
+    
 
     private void Awake()
     {
@@ -24,20 +30,28 @@ public class Scene4 : MonoBehaviour {
         {
             ballParent.GetChild(i).GetComponent<BallAction>().num = random.Next(0,8);
         }
-        maskSpeed = maskSpeed * 0.0001f;
         StartCoroutine(MaskScale());
     }
     IEnumerator MaskScale()
     {
-        while (canMove)
+        yield return new WaitForSeconds(maskTime);
+        while (true)
         {
-            if(mask.transform.localScale.x < 0.63f)
+            mask.transform.DOScale(maskScale,maskScaleTime);
+            yield return new WaitForSeconds(maskScaleTime+ballMoveTime);
+            for (int i = 0; i < ballParent.childCount; i++)
             {
-                canMove = false;
-                break;
+                ballParent.GetChild(i).GetComponent<BallAction>().Hide(); 
             }
-            mask.transform.localScale -= new Vector3(maskSpeed, maskSpeed, maskSpeed);
-            yield return null;
+            yield return new WaitForSeconds(maskTime);
+            mask.transform.DOScale(Vector3.one,maskScaleTime);
+            yield return new WaitForSeconds(maskScaleTime);
+            for (int i = 0; i < ballParent.childCount; i++)
+            {
+                ballParent.GetChild(i).GetComponent<BallAction>().ResetPos();
+                ballParent.GetChild(i).GetComponent<BallAction>().Show();
+            }
+            yield return new WaitForSeconds(maskTime);
         }
     }
 

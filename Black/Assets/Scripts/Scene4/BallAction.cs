@@ -25,6 +25,9 @@ public class BallAction : MonoBehaviour ,IDragHandler{
     private float hideTime;
     private float showTime;
     private bool move = true;
+    private float moveTime;
+    private float moveDistance;
+
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
@@ -46,6 +49,8 @@ public class BallAction : MonoBehaviour ,IDragHandler{
         oldPos = transform.position;
         hideTime = Scene4.Instance.ballHideTime;
         showTime = Scene4.Instance.ballShowTime;
+        moveTime = Scene4.Instance.ballMoveDrua;
+        moveDistance = Scene4.Instance.ballMoveDistance;
         StartCoroutine(BallMove());
     }
 	
@@ -125,14 +130,13 @@ public class BallAction : MonoBehaviour ,IDragHandler{
     /// </summary>
     IEnumerator BallMove()
     {
-        float moveTime = 0.01f;
         while (true)
         {
             if (move)
             {
-                transform.DOMoveY(transform.position.y + 8, moveTime, true);
+                transform.DOMoveY(transform.position.y + moveDistance, moveTime, true);
                 yield return new WaitForSeconds(moveTime);
-                transform.DOMoveY(transform.position.y - 8, moveTime, true);
+                transform.DOMoveY(transform.position.y - moveDistance, moveTime, true);
                 yield return new WaitForSeconds(moveTime);
             }
             yield return null;

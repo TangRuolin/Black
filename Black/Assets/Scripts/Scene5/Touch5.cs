@@ -31,6 +31,10 @@ public class Touch : MonoBehaviour {
         float newDistance = Vector2.Distance(newTouch1.position, newTouch2.position);
         //两个距离之差，为正表示放大手势， 为负表示缩小手势
         float offset = newDistance - oldDistance;
+        if(offset > 0)
+        {
+            offset = 0;
+        }
         //放大因子， 一个像素按 0.01倍来算(100可调整)
         float scaleFactor = offset / 100f;
         Vector3 localScale = transform.localScale;
